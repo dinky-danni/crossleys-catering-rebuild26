@@ -1,7 +1,7 @@
 
 (function(){
   const current = document.body.dataset.page || 'home';
-  const rootPath = current === 'home' ? './' : '../';
+  const rootPath = document.body.dataset.rootPath || (current === 'home' ? './' : '../');
   // Header and footer are rendered once here so navigation/contact updates stay global.
   const navItems = [
     ['home', rootPath, 'Home'],
@@ -10,6 +10,22 @@
     ['sandwich-shop', rootPath + 'sandwich-shop/', 'Sandwich shop'],
     ['contact', rootPath + 'contact/', 'Contact']
   ];
+  const renderEnquiryFields = (sourceSection) => `
+    <input type="hidden" name="form_type" value="enquiry">
+    <input type="hidden" name="source_page" data-enquiry-meta="source_page" value="${current}">
+    <input type="hidden" name="source_section" data-enquiry-meta="source_section" value="${sourceSection}">
+    <input type="hidden" name="page_title" data-enquiry-meta="page_title">
+    <input type="hidden" name="page_path" data-enquiry-meta="page_path">
+    <input type="hidden" name="page_url" data-enquiry-meta="page_url">
+    <div class="form-honeypot" aria-hidden="true">
+      <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+    <label class="form-consent">
+      <input type="checkbox" name="consent" value="yes" required>
+      <span>I consent to Crossley's using these details to respond to my enquiry. See our <a href="${rootPath}privacy-policy/">Privacy Policy</a>.</span>
+    </label>
+    <div class="form-turnstile" data-turnstile-container></div>
+    <p class="form-status" data-form-status hidden></p>`;
   const header = document.getElementById('site-header');
   if(header){
     header.innerHTML = `
@@ -42,16 +58,16 @@
               <p>Available for all your catering needs, celebrations, Weddings, Christenings, Birthdays, Funerals, Conferences, Business Lunches. For affordable and quality catering services in Stockport or Cheshire, call Crossley's on <strong>0161 483 2727</strong> or email us at <a href="mailto:crossleyscatering@gmail.com">crossleyscatering@gmail.com</a>.</p>
             </div>
             ${includeFooterForm ? `
-            <form class="contact-form" action="#" method="post">
+            <form class="contact-form" action="/api/enquiry" method="post" data-enquiry-form>
               <div class="form-grid">
-                <input type="text" name="first-name" placeholder="First Name" aria-label="First Name">
-                <input type="text" name="last-name" placeholder="Last Name" aria-label="Last Name">
+                <input type="text" name="name" placeholder="First Name" aria-label="First Name" required>
+                <input type="text" name="surname" placeholder="Last Name" aria-label="Last Name">
                 <input type="email" name="email" placeholder="Email" aria-label="Email" required>
-                <input type="tel" name="phone" placeholder="Phone number" aria-label="Phone number">
+                <input type="tel" name="phone" placeholder="Phone number" aria-label="Phone number" required>
               </div>
-              <textarea name="message" placeholder="Message" aria-label="Message"></textarea>
+              <textarea name="message" placeholder="Message" aria-label="Message" required></textarea>
+              ${renderEnquiryFields('footer-contact-form')}
               <button type="submit">Send</button>
-              <p class="form-note" hidden>This static form is visual only and will need connecting to a form handler before launch.</p>
             </form>
             ` : ''}
           </div>
@@ -68,7 +84,83 @@
   }
   const footer = document.getElementById('site-footer');
   if(footer){ footer.innerHTML = `<button class="back-top" type="button" aria-label="Back to top">⌃</button>`; }
+
+  const cookieChoiceKey = 'crossleys_cookie_choice';
+  let memoryCookieChoice = null;
+  const getCookieChoice = () => {
+    try{
+      return window.localStorage.getItem(cookieChoiceKey) || memoryCookieChoice;
+    }catch(error){
+      return memoryCookieChoice;
+    }
+  };
+  const setCookieChoice = (choice) => {
+    memoryCookieChoice = choice;
+    try{
+      window.localStorage.setItem(cookieChoiceKey, choice);
+    }catch(error){
+      // Privacy modes can block localStorage; the in-memory value still controls this page view.
+    }
+  };
+  const applyCookieChoice = (choice) => {
+    const optionalAccepted = choice === 'accepted';
+    document.querySelectorAll('[data-cookie-embed]').forEach(embed => {
+      const iframe = embed.querySelector('iframe[data-cookie-src]');
+      const placeholder = embed.querySelector('.cookie-embed-placeholder');
+      if(iframe){
+        if(optionalAccepted && !iframe.src){
+          iframe.src = iframe.dataset.cookieSrc;
+        }
+        if(!optionalAccepted && iframe.src){
+          iframe.removeAttribute('src');
+        }
+      }
+      if(placeholder){
+        placeholder.hidden = optionalAccepted;
+      }
+    });
+  };
+  const updateCookieControls = () => {
+    const choice = getCookieChoice();
+    const banner = document.querySelector('[data-cookie-banner]');
+    const settingsButton = document.querySelector('[data-cookie-open-global]');
+    if(banner) banner.hidden = Boolean(choice);
+    if(settingsButton) settingsButton.hidden = !choice;
+    applyCookieChoice(choice);
+  };
+  const renderCookieControls = () => {
+    if(document.querySelector('[data-cookie-banner]')) return;
+    const controls = document.createElement('div');
+    controls.innerHTML = `
+      <aside class="cookie-banner" data-cookie-banner aria-label="Cookie choices">
+        <div>
+          <h2>Cookie choices</h2>
+          <p>We use essential cookies to make the site work. Optional cookies are only used for embedded services such as Google Maps. You can accept or reject optional cookies at any time.</p>
+          <p class="cookie-banner__links"><a href="${rootPath}cookie-policy/">Cookie Policy</a> <a href="${rootPath}privacy-policy/">Privacy Policy</a></p>
+        </div>
+        <div class="cookie-actions">
+          <button class="btn white" type="button" data-cookie-choice="rejected">Reject Optional Cookies</button>
+          <button class="btn" type="button" data-cookie-choice="accepted">Accept Optional Cookies</button>
+        </div>
+      </aside>
+      <button class="cookie-settings-button" type="button" data-cookie-open-global data-cookie-open hidden>Cookie Settings</button>`;
+    document.body.append(...controls.children);
+    updateCookieControls();
+  };
+  renderCookieControls();
+
   document.addEventListener('click', function(e){
+    const cookieChoiceButton = e.target.closest('[data-cookie-choice]');
+    if(cookieChoiceButton){
+      setCookieChoice(cookieChoiceButton.dataset.cookieChoice);
+      updateCookieControls();
+    }
+    if(e.target.closest('[data-cookie-open]')){
+      const banner = document.querySelector('[data-cookie-banner]');
+      const settingsButton = document.querySelector('[data-cookie-open-global]');
+      if(banner) banner.hidden = false;
+      if(settingsButton) settingsButton.hidden = true;
+    }
     if(e.target.classList.contains('nav-toggle')){
       const links = document.getElementById('nav-links');
       const open = links.classList.toggle('open');
@@ -87,12 +179,108 @@
       }
     }
   });
-  document.addEventListener('submit', function(e){
-    if(e.target.classList.contains('contact-form')){
-      e.preventDefault();
-      alert('This static form is ready visually, but needs connecting to a form handler before launch.');
+  const enquiryForms = [...document.querySelectorAll('[data-enquiry-form]')];
+  const setFormStatus = (form, message, tone) => {
+    const status = form.querySelector('[data-form-status]');
+    if(!status) return;
+    status.textContent = message;
+    status.hidden = !message;
+    status.dataset.tone = tone || 'neutral';
+  };
+  const populateFormMeta = (form) => {
+    const values = {
+      source_page: current,
+      page_title: document.title,
+      page_path: window.location.pathname,
+      page_url: window.location.href
+    };
+    form.querySelectorAll('[data-enquiry-meta]').forEach(input => {
+      input.value = values[input.dataset.enquiryMeta] || input.value || '';
+    });
+  };
+  const resetTurnstile = (form) => {
+    if(window.turnstile){
+      form.querySelectorAll('.cf-turnstile').forEach(widget => {
+        if(widget.dataset.widgetId) window.turnstile.reset(widget.dataset.widgetId);
+      });
     }
+  };
+  const loadTurnstile = (siteKey) => new Promise((resolve, reject) => {
+    if(window.turnstile) return resolve();
+    const existing = document.querySelector('script[data-turnstile-script]');
+    if(existing){
+      existing.addEventListener('load', resolve, { once:true });
+      existing.addEventListener('error', reject, { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.dataset.turnstileScript = 'true';
+    script.addEventListener('load', resolve, { once:true });
+    script.addEventListener('error', reject, { once:true });
+    document.head.appendChild(script);
   });
+  const setupTurnstile = async () => {
+    if(!enquiryForms.length) return;
+    try{
+      const response = await fetch('/api/turnstile-config', { headers:{ accept:'application/json' } });
+      if(!response.ok) return;
+      const config = await response.json();
+      if(!config.turnstileSiteKey) return;
+      await loadTurnstile(config.turnstileSiteKey);
+      enquiryForms.forEach(form => {
+        const container = form.querySelector('[data-turnstile-container]');
+        if(container && !container.querySelector('.cf-turnstile')){
+          const widget = document.createElement('div');
+          widget.className = 'cf-turnstile';
+          container.appendChild(widget);
+          widget.dataset.widgetId = window.turnstile.render(widget, { sitekey: config.turnstileSiteKey });
+        }
+      });
+    }catch(error){
+      enquiryForms.forEach(form => setFormStatus(form, 'Security check will appear when the site is running on Cloudflare Pages.', 'neutral'));
+    }
+  };
+  enquiryForms.forEach(form => {
+    populateFormMeta(form);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      populateFormMeta(form);
+      const button = form.querySelector('button[type="submit"]');
+      const originalText = button ? button.textContent : '';
+      if(button){
+        button.disabled = true;
+        button.textContent = 'Sending...';
+      }
+      setFormStatus(form, 'Sending your enquiry...', 'neutral');
+      try{
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { accept:'application/json' }
+        });
+        const result = await response.json().catch(() => ({}));
+        if(response.status === 404){
+          throw new Error('The enquiry form is ready for Cloudflare Pages. Please call or email us while previewing locally.');
+        }
+        if(!response.ok || !result.ok){
+          throw new Error(result.message || 'The enquiry could not be sent.');
+        }
+        window.location.href = result.redirect || '/thank-you/';
+      }catch(error){
+        resetTurnstile(form);
+        setFormStatus(form, error.message || 'Sorry, something went wrong. Please call or email us instead.', 'error');
+      }finally{
+        if(button){
+          button.disabled = false;
+          button.textContent = originalText;
+        }
+      }
+    });
+  });
+  setupTurnstile();
 
   const reviewGrid = document.querySelector('.review-grid');
   const reviewDots = document.querySelector('.review-dots');

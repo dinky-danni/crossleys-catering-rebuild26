@@ -1,0 +1,5 @@
+# Canonical domain
+https://www.crossleyscatering.co.uk/* https://crossleyscatering.co.uk/:splat 301
+
+# Legacy WordPress front controller
+/index.php / 301

@@ -336,7 +336,67 @@ strong{font-weight:700}
 .contact-page-form button{margin-top:14px;padding:15px 16px}
 .contact-page-form button{background:var(--ink);color:var(--white)}
 .contact-page-form button:hover{background:var(--black);color:var(--white)}
+.map-wrap{position:relative;background:var(--ink)}
 .map-wrap iframe{display:block;width:100%;height:430px;border:0}
+.map-wrap iframe:not([src]){visibility:hidden}
+.cookie-embed-placeholder{
+  position:absolute;
+  inset:0;
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  gap:14px;
+  padding:34px;
+  background:linear-gradient(rgba(17,17,17,.76),rgba(17,17,17,.76)),url("../images/hero-contact.webp") center/cover;
+  color:var(--white);
+  text-align:center;
+}
+.cookie-embed-placeholder[hidden]{display:none}
+.cookie-embed-placeholder h2{margin:0;color:var(--white);font-size:clamp(30px,4vw,48px)}
+.cookie-embed-placeholder p{max-width:620px;margin:0;color:rgba(255,255,255,.82)}
+.cookie-banner{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  z-index:150;
+  width:min(960px,calc(100% - 36px));
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:22px;
+  align-items:center;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:8px;
+  background:rgba(17,17,17,.9);
+  color:var(--white);
+  box-shadow:0 24px 80px rgba(0,0,0,.32);
+  transform:translateX(-50%);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+}
+.cookie-banner[hidden]{display:none}
+.cookie-banner h2{margin:0 0 6px;color:var(--white);font-size:26px;line-height:1}
+.cookie-banner p{margin:0;color:rgba(255,255,255,.78);font-size:13px;line-height:1.55}
+.cookie-banner__links{display:flex;gap:14px;margin-top:8px!important}
+.cookie-banner__links a{color:var(--accent);font-weight:700}
+.cookie-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.cookie-actions .btn{min-width:auto;white-space:nowrap}
+.cookie-settings-button{
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  z-index:140;
+  min-height:38px;
+  padding:0 16px;
+  border:1px solid var(--accent-line);
+  border-radius:999px;
+  background:var(--ink);
+  color:var(--white);
+  font:700 12px/1 var(--body);
+  box-shadow:0 12px 38px rgba(0,0,0,.22);
+  cursor:pointer;
+}
+.cookie-settings-button[hidden]{display:none}
 
 .policy-page{min-height:400px;background:#2f2f2f;text-align:center}
 .policy-page .container{padding:140px 0 60px}
@@ -348,6 +408,10 @@ strong{font-weight:700}
 .policy-content p{margin:0 0 20px;color:rgba(17,17,17,.76);font-size:16px;line-height:1.75}
 .policy-content p:last-child{margin-bottom:0}
 .policy-content strong{color:var(--ink)}
+.not-found-content{text-align:center}
+.not-found-content p{max-width:650px;margin-inline:auto}
+.not-found-actions{margin-top:28px}
+.not-found-actions .btn.white{border:1px solid var(--line)}
 
 .footer-contact{padding:54px 0 24px;background:var(--ink);color:var(--white);text-align:left}
 .footer-contact .container{max-width:1120px}
@@ -364,8 +428,19 @@ strong{font-weight:700}
 .contact-form input,.contact-form textarea{width:100%;border:0;border-radius:6px;padding:12px 14px;background:var(--white);color:var(--ink);font:400 13px/1.4 var(--body)}
 .contact-form input:focus,.contact-form textarea:focus{outline:2px solid var(--accent);outline-offset:0}
 .contact-form textarea{min-height:88px;margin-top:10px;resize:vertical}
+.form-honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-consent{display:flex;align-items:flex-start;gap:9px;margin:12px 0 0;color:var(--white);font-size:12px;line-height:1.45}
+.form-consent input{width:auto;margin-top:2px;accent-color:var(--accent)}
+.form-consent a{color:var(--accent);font-weight:700}
+.contact-page-form .form-consent{color:var(--ink)}
+.form-turnstile{margin-top:12px}
+.form-status{margin:10px 0 0;color:var(--white);font-size:13px;line-height:1.45}
+.contact-page-form .form-status{color:var(--ink)}
+.form-status[data-tone="error"]{color:#ffdfdf}
+.contact-page-form .form-status[data-tone="error"]{color:#8a1f1f}
 .contact-form button{width:100%;margin-top:10px;padding:12px 16px;border:0;border-radius:6px;background:var(--white);color:var(--black);font:700 14px/1 var(--body);cursor:pointer}
 .contact-form button:hover{background:var(--soft);color:var(--black)}
+.contact-form button:disabled{cursor:wait;opacity:.72}
 .footer-contact__bottom{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12)}
 .policy-links{display:flex;justify-content:flex-start;gap:18px;flex-wrap:wrap;margin:0;color:var(--white);font-size:12px}
 .footer-contact strong,.policy-links a:hover{color:var(--accent)}
@@ -416,4 +491,8 @@ strong{font-weight:700}
   .review-logos{gap:22px;flex-wrap:wrap;margin-bottom:28px}
   .form-grid{grid-template-columns:1fr}
   .map-wrap iframe{height:330px}
+  .cookie-banner{grid-template-columns:1fr;bottom:14px;width:calc(100% - 28px)}
+  .cookie-actions{justify-content:flex-start}
+  .cookie-actions .btn{width:100%}
+  .cookie-settings-button{left:14px;bottom:14px}
 }

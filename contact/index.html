@@ -25,20 +25,45 @@
             <p><span>Email</span>crossleyscatering@gmail.com</p>
           </div>
         </div>
-        <form class="contact-form contact-page-form" action="#" method="post">
+        <form class="contact-form contact-page-form" action="/api/enquiry" method="post" data-enquiry-form>
           <h2>Send us a message</h2>
           <div class="form-grid">
-            <input type="text" name="first-name" placeholder="First Name" aria-label="First Name">
-            <input type="text" name="last-name" placeholder="Last Name" aria-label="Last Name">
+            <input type="text" name="name" placeholder="First Name" aria-label="First Name" required>
+            <input type="text" name="surname" placeholder="Last Name" aria-label="Last Name">
             <input type="email" name="email" placeholder="Email" aria-label="Email" required>
-            <input type="tel" name="phone" placeholder="Phone number" aria-label="Phone number">
+            <input type="tel" name="phone" placeholder="Phone number" aria-label="Phone number" required>
           </div>
-          <textarea name="message" placeholder="Message" aria-label="Message"></textarea>
+          <textarea name="message" placeholder="Message" aria-label="Message" required></textarea>
+          <input type="hidden" name="form_type" value="enquiry">
+          <input type="hidden" name="source_page" data-enquiry-meta="source_page" value="contact">
+          <input type="hidden" name="source_section" data-enquiry-meta="source_section" value="contact-page-form">
+          <input type="hidden" name="page_title" data-enquiry-meta="page_title">
+          <input type="hidden" name="page_path" data-enquiry-meta="page_path">
+          <input type="hidden" name="page_url" data-enquiry-meta="page_url">
+          <div class="form-honeypot" aria-hidden="true">
+            <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <label class="form-consent">
+            <input type="checkbox" name="consent" value="yes" required>
+            <span>I consent to Crossley's using these details to respond to my enquiry. See our <a href="../privacy-policy/">Privacy Policy</a>.</span>
+          </label>
+          <div class="form-turnstile" data-turnstile-container></div>
+          <p class="form-status" data-form-status hidden></p>
           <button type="submit">Send</button>
         </form>
       </div>
     </section>
-    <section class="map-wrap" id="map"><iframe title="Crossleys Bakers map" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d9517.957251323205!2d-2.1349215!3d53.3881864!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x209d9146a91562e5!2sCrossleys%20Bakers!5e0!3m2!1sen!2sro!4v1607388971119!5m2!1sen!2sro" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></section>
+    <section class="map-wrap" id="map" data-cookie-embed>
+      <iframe title="Crossleys Bakers map" data-cookie-src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d9517.957251323205!2d-2.1349215!3d53.3881864!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x209d9146a91562e5!2sCrossleys%20Bakers!5e0!3m2!1sen!2sro!4v1607388971119!5m2!1sen!2sro" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="cookie-embed-placeholder">
+        <h2>View our location</h2>
+        <p>Google Maps is blocked until optional cookies are accepted. You can update your cookie choice or open the location directly in Google Maps.</p>
+        <div class="btn-row">
+          <button class="btn" type="button" data-cookie-open>Cookie Settings</button>
+          <a class="btn white" href="https://www.google.com/maps/search/?api=1&query=Crossleys%20Bakers%20377-379%20Buxton%20Road%20Stockport%20SK2%207EY" target="_blank" rel="noopener">Open Google Maps</a>
+        </div>
+      </div>
+    </section>
 
   </main>
   <div id="global-contact"></div>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /thank-you/
+Disallow: /404.html
+
+Sitemap: https://crossleyscatering.co.uk/sitemap.xml

@@ -1,0 +1,14 @@
+name = "crossleys-catering-rebuild26"
+compatibility_date = "2026-05-27"
+pages_build_output_dir = "."
+
+[vars]
+BREVO_SENDER_EMAIL = "your-verified-sender@example.com"
+BREVO_SENDER_NAME = "Crossleys Catering"
+ENQUIRY_NOTIFICATION_EMAIL = "crossleyscatering@gmail.com"
+ENQUIRY_SUCCESS_PATH = "/thank-you/"
+TURNSTILE_SITE_KEY = "TURNSTILE_SITE_KEY_PLACEHOLDER"
+
+# Configure these as Cloudflare Pages secrets:
+# BREVO_API_KEY
+# TURNSTILE_SECRET_KEY
